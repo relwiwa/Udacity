@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript">
+
+function promiseTesting() {
+
+/* - Example showing that code written within the promise, but after the
+     resolve and reject functions have been called, still gets executed.
+	 - When it gets executed, depends on how long the respective code needs
+	   to be ready.
+	 - Without the timeouts, the sequence would most probably be
+	   first - second - success: third/error: third */
+var promise1 = new Promise(function(resolve, reject) {
+	console.log("first");
+	if (Math.random() > 0.5) {
+		resolve("success");
+	}
+	else {
+		window.setTimeout(function() {
+			reject("error");
+		}, 5000);
+	}
+	if (Math.random() > 0.5) {
+		window.setTimeout(function() {
+			console.log("second");	// gets executed, even though resolve or reject have already been called!
+		}, 5000);
+	}
+	else {
+		console.log("second");
+	}
+})
+.then(function(msg) {
+	console.log(msg + ": third");
+})
+.catch(function(msg) {
+	console.log(msg + ": third");
+});
+
+/* - Promise that randomly succeeds or fails in loading an image */
+var promise2 = new Promise(function(resolve, reject) {
+	var img = document.createElement("img");
+	if (Math.random() > 0.5) {
+		img.src = "images/no-image.jpg";
+	}
+	else {
+		img.src = "images/image.jpg";
+	}
+	img.onload = resolve;
+	img.onerror = reject;
+	document.body.appendChild(img);
+})
+.then(function() {
+	console.log("success");
+})
+.catch(function() {
+	console.log("error");
+});
+
+};
+</script>
+
+</head>
+
+<body onload="promiseTesting();">
+</body>
+
+</html>
