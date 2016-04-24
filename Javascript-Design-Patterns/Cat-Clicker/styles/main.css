@@ -2,12 +2,60 @@ body {
 	width:100%;
 	height:100%;
 	text-align:center;
+	background:lightblue;
 }
 
 #container {
+	width:100%;
+	height:100%;
 	text-align:center;
 }
 
-#cat-0, #cat-1 {
+#full-view {
 	display:none;
+	position:fixed;
+	top:0;
+	left:0;
+	width:60%;
+}
+
+#full-view img {
+	max-width:90%;
+	margin:5%;
+}
+
+#list-view {
+	position:absolute;
+	top:0;
+	right:0;
+	width:40%;
+}
+
+#list-view img {
+	max-width:50%;
+	margin:2% 5%;
+}
+
+img {
+	border:5px solid gray;
+	border-radius:10%;
+}
+
+span {
+	font-weight:bold;
+}
+
+#pixabay {
+	position:absolute;
+	bottom:10px;
+	right:10px;
+	opacity:0.5;
+	background:gray;
+	color:#fff;
+	padding:10px;
+	border-radius:5%;
+}
+
+a {
+	color:#fff;
 }
