@@ -19,8 +19,12 @@ $(function(){
 
     var octopus = {
         addNewNote: function(noteStr) {
+						// this data should be in the model
             model.add({
-                content: noteStr
+								// noteStr input should be checked for bad input!!
+                content: noteStr,
+								// store date of creation
+								created: Date.now()
             });
             view.render();
         },
@@ -51,7 +55,9 @@ $(function(){
         render: function(){
             var htmlStr = '';
             octopus.getNotes().forEach(function(note){
+								var dateObj = new Date(note.created);
                 htmlStr += '<li class="note">'+
+			                  '<span class="note-date">Created on: ' + dateObj.toLocaleDateString() + ', ' + dateObj.toLocaleTimeString() + '</span>' +
                         note.content +
                     '</li>';
             });
