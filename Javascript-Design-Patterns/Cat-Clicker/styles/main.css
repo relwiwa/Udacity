@@ -46,7 +46,7 @@ span {
 }
 
 #pixabay {
-	position:absolute;
+	position:fixed;
 	bottom:10px;
 	right:10px;
 	opacity:0.5;
