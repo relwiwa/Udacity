@@ -150,9 +150,11 @@ var listView = {
 /********************************************************************************
 - initalizes fullView with first cat image in model.cats
 - also shows cat's name and counter
-- the image element is recreated each time, so that a new event listener
-  can be added to it upon every change. this avoids having to get rid of
-	the event listener before adding a new one
+- the image element is now only created once during init
+- the event listener is also only added once during init, as it is not tied to
+  the individual image element or cat, but has a static link to currentCat
+- showCat only updates the three variables catName, catCounter, and catImage;
+  for this to work, the respective elements get stored as properties of fullView
 - communication between model, octopus and views happens via cats object and
   current cat, not ids
 ********************************************************************************/
@@ -161,7 +163,16 @@ var fullView = {
 	init: function() {
 		var cat = octopus.getCurrentCat();
 		if (cat !== null) {
-			fullView.showCat(octopus.getCurrentCat());
+			this.catName = document.getElementById("cat-name");
+			this.catCounter = document.getElementById("cat-counter");
+			var elem = document.createElement("img");
+			elem.src = cat.url;
+			elem.setAttribute("id", "cat-image");
+			document.getElementById("full-view").insertBefore(elem, document.getElementById("cat-legend"));
+			document.getElementById("cat-image").addEventListener("click", function() {
+				octopus.updateCounter(octopus.getCurrentCat());
+			});
+			this.catImage = document.getElementById("cat-image");
 			document.getElementById("full-view").style.display = "block";
 		}
 		else {
@@ -171,20 +182,9 @@ var fullView = {
 	},
 
 	showCat: function(cat) {
-		document.getElementById("cat-name").textContent = cat.name;
-		document.getElementById("cat-counter").textContent = cat.counter;
-		var elem = document.createElement("img");
-		elem.src = cat.url;
-		elem.setAttribute("id", "cat-image");
-		if (document.getElementById("cat-image")) {
-			document.getElementById("full-view").replaceChild(elem, document.getElementById("full-view").getElementsByTagName("img")[0]);
-		}
-		else {
-			document.getElementById("full-view").insertBefore(elem, document.getElementById("cat-legend"));
-		}
-		document.getElementById("cat-image").addEventListener("click", function() {
-			octopus.updateCounter(octopus.getCurrentCat());
-		});
+		this.catName.textContent = cat.name;
+		this.catCounter.textContent = cat.counter;
+		this.catImage.src = cat.url;
 	},
 
 	updateCounter: function(cat) {
