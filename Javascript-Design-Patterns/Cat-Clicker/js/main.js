@@ -1,9 +1,10 @@
 /* Cat Clicker App for Udacity Course Javascript Design Patterns
 
-	 Second Requirements Change:
-	 - Display small images of at least five cats
-	 - When small image is clicked, show large image with cat's name and counter
-	 - Clicking on large image increases respective counter
+	 Third Requirements Change, Cat Clicker Premium:
+	 - No change in functionality
+	 - Code is supposed to be organized in model, view, octopus manner
+	 - There's no direct communication between model and view/s, octopus handels
+	   the communcation between model and view/s
 
 	 	 This implementation uses native ES6 Promises, so only working in latest browsers */
 
@@ -12,10 +13,25 @@
 - there's a Cat object containing one cat's information
 - all cats are stored in cats array
 - currentCat in fullView is stored in currentCat
+- initially, currentCat is set to the first cat in cats array
 **************************************************************/
 var model = {
 	cats: [],
-	currentCat: null
+	currentCat: null,
+
+	init: function() {
+		if (this.cats.length > 0) {
+			model.currentCat = model.cats[0];
+		}
+		else {
+			console.log("no cats to play with")
+		}
+	},
+
+	increaseCounter: function(cat) {
+		cat.counter++;
+	}
+
 };
 
 /* Cat Object with properties */
@@ -41,6 +57,10 @@ var octopus = {
 	getCat: function(catId) {
 		return model.cats[catId];
 	},
+	
+	getCurrentCat: function() {
+		return model.currentCat;
+	},
 
 	getAllCats: function() {
 		return model.cats;
@@ -50,17 +70,29 @@ var octopus = {
 		model.currentCat = model.cats[catId];
 	},
 
-	/* Interaction with fullView */
+	/* Interaction with views */
 
 	showCurrentCat: function() {
-
+		fullView.showCat(octopus.getCurrentCat());
 	},
 
+	/* Interaction with model and view */
+		
+	updateCounter: function(cat) {
+		model.increaseCounter(cat);
+		fullView.updateCounter(cat);
+	},
+
+	/* Initialization */
+	
 	init: function() {
+		model.init();
 		listView.init();
+		fullView.init();
 	}
 
 };
+
 
 /* LISTVIEW OBJECT */
 /********************************************************************************
@@ -74,18 +106,23 @@ var listView = {
 
 	init: function() {
 		var allCats = octopus.getAllCats();
-		for (var i = 0; i < allCats.length; i++) {
-			new Promise(function(resolve, reject) {
-				var img = document.createElement("img");
-				img.src = allCats[i].url;
-				img.onload = resolve(i);
-				img.onerror = reject(new Error("Problem occured while loading image" + i));
-				document.getElementById("list-view").appendChild(img);
-			})
-			.then(listView.addListener(i))
-			.catch(function(error) {
-				console.log(error.message);
-			});
+		if (allCats.length > 0) {
+			for (var i = 0; i < allCats.length; i++) {
+				new Promise(function(resolve, reject) {
+					var img = document.createElement("img");
+					img.src = allCats[i].url;
+					img.onload = resolve(i);
+					img.onerror = reject(new Error("Problem occured while loading image" + i));
+					document.getElementById("list-view").appendChild(img);
+				})
+				.then(listView.addListener(i))
+				.catch(function(error) {
+					console.log(error.message);
+				});
+			}
+		}
+		else {
+			console.log("no cats to play with");
 		}
 	},
 
@@ -110,44 +147,50 @@ var listView = {
 
 
 /* FULLVIEW OBJECT */
-
+/********************************************************************************
+- initalizes fullView with first cat image in model.cats
+- also shows cat's name and counter
+- the image element is recreated each time, so that a new event listener
+  can be added to it upon every change. this avoids having to get rid of
+	the event listener before adding a new one
+- communication between model, octopus and views happens via cats object and
+  current cat, not ids
+********************************************************************************/
 var fullView = {
 
-};
+	init: function() {
+		var cat = octopus.getCurrentCat();
+		if (cat !== null) {
+			fullView.showCat(octopus.getCurrentCat());
+			document.getElementById("full-view").style.display = "block";
+		}
+		else {
+			console.log("no current cat to play with");
+			document.getElementById("full-view").style.display = "none";
+		}
+	},
 
-/* displayCat function:
-   - Sets up the full view of an image as well as name and counter.
-	 - Its functionality is based on the id parameter, that represents
-	   the place of the respective cats object in the myCatClicker.cats
-		 array.
-	 - The image element is recreated each time, so that a new event
-	   listener can be added upon every change. Otherwise it seems
-		 complicated to get rid of the event listener before adding
-		 the new one 
- 	 - At first display of a full view image, img-element gets inserted,
-	   later the existing image element gets replaced */
-Cat.prototype.displayCat = function(id) {
-	document.getElementById("cat-name").textContent = this.name;
-	document.getElementById("cat-counter").textContent = this.counter;
-	var elem = document.createElement("img");
-	elem.src = this.url;
-	elem.setAttribute("id", "cat-image");
-	if (document.getElementById("cat-image")) {
-		document.getElementById("full-view").replaceChild(elem, document.getElementById("full-view").getElementsByTagName("img")[0]);
-	}
-	else {
-		document.getElementById("full-view").insertBefore(elem, document.getElementById("cat-legend"));
-	}
-	document.getElementById("full-view").style.display = "block";
-	document.getElementById("cat-image").addEventListener("click", function() {
-		 myCatClicker.cats[id].increaseCounter();	
-	});
-};
+	showCat: function(cat) {
+		document.getElementById("cat-name").textContent = cat.name;
+		document.getElementById("cat-counter").textContent = cat.counter;
+		var elem = document.createElement("img");
+		elem.src = cat.url;
+		elem.setAttribute("id", "cat-image");
+		if (document.getElementById("cat-image")) {
+			document.getElementById("full-view").replaceChild(elem, document.getElementById("full-view").getElementsByTagName("img")[0]);
+		}
+		else {
+			document.getElementById("full-view").insertBefore(elem, document.getElementById("cat-legend"));
+		}
+		document.getElementById("cat-image").addEventListener("click", function() {
+			octopus.updateCounter(octopus.getCurrentCat());
+		});
+	},
 
-/* increaseCounter function */
-Cat.prototype.increaseCounter = function() {
-	this.counter++;
-	document.getElementById("cat-counter").textContent = this.counter;
+	updateCounter: function(cat) {
+		document.getElementById("cat-counter").textContent = cat.counter;
+	}
+
 };
 
 
