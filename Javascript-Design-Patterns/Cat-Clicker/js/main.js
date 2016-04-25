@@ -1,10 +1,10 @@
 /* Cat Clicker App for Udacity Course Javascript Design Patterns
 
-	 Third Requirements Change, Cat Clicker Premium:
-	 - No change in functionality
-	 - Code is supposed to be organized in model, view, octopus manner
-	 - There's no direct communication between model and view/s, octopus handels
-	   the communcation between model and view/s
+	 Fourth Requirements Change, Cat Clicker Premium Pro:
+	 - Add an admin area where it's possible to change the values of the currently
+	   displayed cat and its image
+	 - Accessible via admin button
+	 - Admin area has save and cancel button
 
 	 	 This implementation uses native ES6 Promises, so only working in latest browsers */
 
@@ -34,8 +34,11 @@ var model = {
 
 };
 
-/* Cat Object with properties */
+/* Cat Object with properties
+   - id gets set in listView's init function and is necessary to
+	   update a specific listView element */
 Cat = function(name, url) {
+	this.id;
 	this.name = name;
 	this.url = url;
 	this.counter = 0;
@@ -57,17 +60,13 @@ var octopus = {
 	getCat: function(catId) {
 		return model.cats[catId];
 	},
-	
+
 	getCurrentCat: function() {
 		return model.currentCat;
 	},
 
 	getAllCats: function() {
 		return model.cats;
-	},
-
-	updateCurrentCat: function(catId) {
-		model.currentCat = model.cats[catId];
 	},
 
 	/* Interaction with views */
@@ -77,18 +76,33 @@ var octopus = {
 	},
 
 	/* Interaction with model and view */
-		
+
 	updateCounter: function(cat) {
 		model.increaseCounter(cat);
 		fullView.updateCounter(cat);
+		adminView.updateCounter(cat);
+	},
+
+	updateCurrentCat: function(catId) {
+		model.currentCat = model.cats[catId];
+		adminView.updateView();
+	},
+
+	updateCatProperty: function(cat, property, value) {
+		cat[property] = value;
+		fullView.showCat(cat);
+		if (property === "url") {
+			listView.updateUrl(cat)
+		}
 	},
 
 	/* Initialization */
-	
+
 	init: function() {
 		model.init();
 		listView.init();
 		fullView.init();
+		adminView.init();
 	}
 
 };
@@ -101,6 +115,7 @@ var octopus = {
 - adds event listener to each image element
 - addListener function keeps track of respective cats number via resolve function
 - alternative way would be doing it via IIFE or without a promise
+- updateUrl updates an image in listView after it's been changed in admin area
 ********************************************************************************/
 var listView = {
 
@@ -108,6 +123,7 @@ var listView = {
 		var allCats = octopus.getAllCats();
 		if (allCats.length > 0) {
 			for (var i = 0; i < allCats.length; i++) {
+				allCats[i].id = i;
 				new Promise(function(resolve, reject) {
 					var img = document.createElement("img");
 					img.src = allCats[i].url;
@@ -124,6 +140,17 @@ var listView = {
 		else {
 			console.log("no cats to play with");
 		}
+	},
+	
+	updateUrl: function(cat) {
+		new Promise(function(resolve, reject) {
+			var img = document.getElementById("list-view").getElementsByTagName("img")[cat.id];
+			img.src = octopus.getCat(cat.id).url;
+			img.onload = resolve();
+			img.onerror = reject();
+		})
+		.then()
+		.catch();
 	},
 
 	addListener: function(i) {
@@ -191,6 +218,78 @@ var fullView = {
 	updateCounter: function(cat) {
 		document.getElementById("cat-counter").textContent = cat.counter;
 	}
+
+};
+
+
+/* ADMINVIEW OBJECT */
+/********************************************************************************
+- shows/hides admin area where it's possible to change properties of currentCat
+  image
+- references to html elements are stored as properties of adminView
+- values in admin area get updated every time a image is changed in listView or
+  clicked in fullView
+- when clicking the admin button, values of currentCat are displayed
+- when changes are made and saved, the data in the model gets updated via
+  octopus; there, also the full view gets updated; if url changed, the respective
+	image in listView gets updated, too
+********************************************************************************/
+var adminView = {
+	
+	viewDisplayed: false,
+	
+	init: function() {
+		document.getElementById("admin-button").addEventListener("click", adminView.toggleView);
+		document.getElementById("admin-save").addEventListener("click", adminView.saveInput);
+		document.getElementById("admin-cancel").addEventListener("click", adminView.toggleView);
+		adminView.adminName = document.getElementById("admin-name");
+		adminView.adminUrl = document.getElementById("admin-url");
+		adminView.adminCounter = document.getElementById("admin-counter");
+		adminView.updateView();
+	},
+
+	toggleView: function() {
+		if (adminView.viewDisplayed === true) {
+			adminView.viewDisplayed = false;
+			document.getElementById("admin-view").style.display = "none";
+			document.getElementById("admin").style.opacity = "0.5";
+		}
+		else {
+			adminView.viewDisplayed = true;
+			document.getElementById("admin-view").style.display = "block";
+			document.getElementById("admin").style.opacity = "1.0";
+		}
+	},
+
+	updateView: function() {
+		var cat = octopus.getCurrentCat();
+		if (cat !== null) {
+			adminView.adminName.value = cat.name;
+			adminView.adminUrl.value = cat.url;
+			adminView.adminCounter.value = cat.counter;
+		}
+		else {
+			console.log("no cat to play with");
+		}
+	},
+
+	updateCounter: function(cat) {
+		adminView.adminCounter.value = cat.counter;
+	},
+	
+	saveInput: function() {
+		var cat = octopus.getCurrentCat();
+		if (cat.name !== adminView.adminName.value) {
+			octopus.updateCatProperty(cat, "name", adminView.adminName.value);
+		}
+		if (cat.url !== adminView.adminUrl.value) {
+			octopus.updateCatProperty(cat, "url", adminView.adminUrl.value);
+		}
+		if (cat.counter !== adminView.adminCounter.value) {
+			octopus.updateCatProperty(cat, "counter", adminView.adminCounter.value);
+		}
+		adminView.toggleView();
+	},
 
 };
 

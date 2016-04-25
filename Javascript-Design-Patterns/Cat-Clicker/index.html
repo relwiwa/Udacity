@@ -11,8 +11,30 @@
 <body>
 	<div id="container">
 		
-		<div id="full-view">
-			<p id="cat-legend">The image of <span id="cat-name"></span> has been clicked <span id="cat-counter">0</span> times</p>
+		<div id="left">
+
+			<div id="full-view">
+				<p id="cat-legend">The image of <span id="cat-name"></span> has been clicked <span id="cat-counter"></span> times</p>
+			</div>
+
+			<div id="admin-view">
+				
+				<h3>Admin Area</h3>
+				
+				<label for="admin-name">Name:</label>
+				<input id="admin-name" name="admin-name" type="text" /><br>
+				<label name="admin-url">Url:</label>
+				<input id="admin-url" name="admin-url" type="text" /><br>
+				<label for="admin-counter">Clicked:</label>
+				<input id="admin-counter" name="admin-counter" type="number" />
+				
+				<div id="admin-buttons">
+					<input id="admin-cancel" type="button" value="Cancel" />
+					<input id="admin-save" type="button" value="Save" />
+				</div>
+			
+			</div>
+
 		</div>
 		
 		<div id="list-view"></div>
@@ -20,6 +42,8 @@
 	</div>
 	
 	<div id="pixabay">All images from <a href="http://www.pixabay.com">pixabay.com</a>.</div>
+	
+	<div id="admin"><a id="admin-button" href="#" title="Admin Area">Admin</a></div>
 	
 </body>
 	
