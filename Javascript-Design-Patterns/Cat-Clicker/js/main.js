@@ -174,6 +174,7 @@ var fullView = {
 			});
 			this.catImage = document.getElementById("cat-image");
 			document.getElementById("full-view").style.display = "block";
+			fullView.showCat(cat);
 		}
 		else {
 			console.log("no current cat to play with");
