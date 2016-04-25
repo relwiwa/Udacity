@@ -7,15 +7,112 @@
 
 	 	 This implementation uses native ES6 Promises, so only working in latest browsers */
 
-/* Application Object */
-var myCatClicker = {};
+/* MODEL OBJECT */
+/**************************************************************
+- there's a Cat object containing one cat's information
+- all cats are stored in cats array
+- currentCat in fullView is stored in currentCat
+**************************************************************/
+var model = {
+	cats: [],
+	currentCat: null
+};
 
-/* Cat Object with properties and prototype methods */
+/* Cat Object with properties */
 Cat = function(name, url) {
 	this.name = name;
 	this.url = url;
-	this.image;
 	this.counter = 0;
+};
+
+/* Cats with their stats */
+model.cats.push(new Cat("Tommy", "images/cat-649164_640.jpg"));
+model.cats.push(new Cat("Bobby", "images/cat-401124_640.jpg"));
+model.cats.push(new Cat("Susan and Christy", "images/cat-205757_640.jpg"));
+model.cats.push(new Cat("Cindy", "images/cat-1280855_640.jpg"));
+model.cats.push(new Cat("Berta", "images/cats-796437_640.jpg"));
+
+/* OCTOPUS OBJECT */
+
+var octopus = {
+
+	/* Interaction with data in model */
+
+	getCat: function(catId) {
+		return model.cats[catId];
+	},
+
+	getAllCats: function() {
+		return model.cats;
+	},
+
+	updateCurrentCat: function(catId) {
+		model.currentCat = model.cats[catId];
+	},
+
+	/* Interaction with fullView */
+
+	showCurrentCat: function() {
+
+	},
+
+	init: function() {
+		listView.init();
+	}
+
+};
+
+/* LISTVIEW OBJECT */
+/********************************************************************************
+- gets all Cats from Octopus
+- sets up an image element for each cat (promise)
+- adds event listener to each image element
+- addListener function keeps track of respective cats number via resolve function
+- alternative way would be doing it via IIFE or without a promise
+********************************************************************************/
+var listView = {
+
+	init: function() {
+		var allCats = octopus.getAllCats();
+		for (var i = 0; i < allCats.length; i++) {
+			new Promise(function(resolve, reject) {
+				var img = document.createElement("img");
+				img.src = allCats[i].url;
+				img.onload = resolve(i);
+				img.onerror = reject(new Error("Problem occured while loading image" + i));
+				document.getElementById("list-view").appendChild(img);
+			})
+			.then(listView.addListener(i))
+			.catch(function(error) {
+				console.log(error.message);
+			});
+		}
+	},
+
+	addListener: function(i) {
+		document.getElementById("list-view").getElementsByTagName("img")[i].addEventListener("click", function() {
+			octopus.updateCurrentCat(i);
+			octopus.showCurrentCat();
+		});
+	}
+
+	/* Alternative version of addListener with IIFE below:
+		addListener: function(i) {
+		(function(arg) {
+			document.getElementById("list-view").getElementsByTagName("img")[arg].addEventListener("click", function() {
+				octopus.updateCurrentCat(arg);
+				octopus.showCurrentCat();
+			});
+		})(i);
+	}*/
+
+};
+
+
+/* FULLVIEW OBJECT */
+
+var fullView = {
+
 };
 
 /* displayCat function:
@@ -53,16 +150,10 @@ Cat.prototype.increaseCounter = function() {
 	document.getElementById("cat-counter").textContent = this.counter;
 };
 
-/* Cats with their stats */
-myCatClicker.cats = [];
-myCatClicker.cats.push(new Cat("Tommy", "images/cat-649164_640.jpg"));
-myCatClicker.cats.push(new Cat("Bobby", "images/cat-401124_640.jpg"));
-myCatClicker.cats.push(new Cat("Susan and Christy", "images/cat-205757_640.jpg"));
-myCatClicker.cats.push(new Cat("Cindy", "images/cat-1280855_640.jpg"));
-myCatClicker.cats.push(new Cat("Berta", "images/cats-796437_640.jpg"));
 
 /* ready function
-   - returns Promise when document is completely loaded */
+   - returns Promise when document is completely loaded
+	 - ES6 Promise */
 function ready() {
 	return new Promise(function(resolve, reject) {
 		document.addEventListener('readystatechange', function() {
@@ -77,31 +168,4 @@ function ready() {
 };
 
 
-/* initiateCats function
-   - sets up list-view after document is fully loaded:
-	 - creates a promise for each image
-	 - within the promise, image element gets created and image gets loaded
-	 - event listener gets added with IIFE */
-function initiateListView() {
-	for (var i = 0; i < myCatClicker.cats.length; i++) {
-		new Promise(function(resolve, reject) {
-			var img = document.createElement("img");
-			img.src = myCatClicker.cats[i].url;
-			img.onload = resolve(i);
-			img.onerror = reject(new Error("Problem occured while loading image" + i));
-			myCatClicker.cats[i].image = img; // reference to img element within cat object
-			document.getElementById("list-view").appendChild(img);
-		})
-		.then(function(i) {
-			myCatClicker.cats[i].image.addEventListener("click", function() {
-				myCatClicker.cats[i].displayCat(i);
-			});
-		})
-		.catch(function(error) {
-			console.log(error.message);
-		});	
-		
-	}
-};
-
-ready().then(initiateListView);
+ready().then(octopus.init);
