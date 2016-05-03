@@ -2,14 +2,14 @@
 
 	 Another Go at the Cat Clicker App, this time using Knockout.js */
 
-var Cat = function() {
+var Cat = function(data) {
 
 // Observables
 	
 	this.clickCount = ko.observable(0);
-	this.name = ko.observable("Tommy");
-	this.imgSrc = ko.observable("images/cat-649164_640.jpg");
-	this.nicknames = ko.observableArray(["Tomti", "Tommmmahawk"]);
+	this.name = ko.observable(data.name);
+	this.imgSrc = ko.observable(data.imgSrc);
+	this.nicknames = ko.observableArray(data.nicknames);
 
 // Computed observables
 
@@ -38,10 +38,22 @@ var Cat = function() {
 var ViewModel = function() {
 	var self = this;
 
-	this.currentCat = ko.observable(new Cat());
+	this.allCats = ko.observableArray();
+	
+	for (var i = 0; i < initialCats.length; i++) {
+		self.allCats().push(new Cat(initialCats[i]));
+	}
+
+	this.currentCat = ko.observable(this.allCats()[0]);
 	
 	this.incrementCounter = function() {
 		self.currentCat().clickCount(self.currentCat().clickCount() + 1);
+	};
+	
+	/* Knockout provides Cat object that was clicked, so we only need to give
+	   currentCat this Cat object and all the rest will update */ 
+	this.changeCurrentCat = function(data) {
+		self.currentCat(data);
 	};
 	
 };
