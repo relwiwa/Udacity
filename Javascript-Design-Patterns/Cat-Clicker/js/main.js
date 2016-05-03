@@ -1,19 +1,44 @@
 /* Cat Clicker App for Udacity Course Javascript Design Patterns
 
-	 Another Go at the Cat Clicker App, this time using Knockout.js */
+	 Another Go at the Cat Clicker App, this time using Knockout.js
+	 
+	 It includes all the functionality of the previous pure JS version, plus:
+	 - There are levels, reflecting the number of clicks
+	 - Nicknames are displayed
+	 - Several cats on a pic can now be treated individually
+	 
+	 Changing nicknames has been added to the admin area.
+	 
+	 Nice to have functionalities to be done:
+	 - add (or remove) cats from a picture in admin area
+	 - add (or remove) nicknames for indidviual cats in admin area */
 
 var Cat = function(data) {
 
-// Observables
+	// Observables
 	
 	this.clickCount = ko.observable(0);
-	this.name = ko.observable(data.name);
 	this.imgSrc = ko.observable(data.imgSrc);
-	this.nicknames = ko.observableArray();
-	for (var i = 0; i < data.nicknames.length; i++) {
-		var newNickname = {};
-		newNickname["nickname-" + i] = ko.observable(data.nicknames[i]);
-		this.nicknames.push(newNickname);
+	this.names = ko.observableArray();
+	this.multipleCats = ko.observable(false);
+	if (data.naming.length > 1) {
+		this.multipleCats(true);
+	}
+	/* - Adding each name and each nickname as observables, so that changes in admin
+			 take effect via the two-way binding.
+		 - For an unknown reason, this only works, when adding the observables as
+		 	 objects to the observableArray. It's not working when just adding them as
+			 array elements, which makes everything pretty complicated */
+	for (var i = 0; i < data.naming.length; i++) {
+		var newName = {};
+		newName["name"] = ko.observable(data.naming[i].name);
+		this.names.push(newName);
+		this.names()[i].nicknames = ko.observableArray();
+		for (var j = 0; j < data.naming[i].nicknames.length; j++) {
+			var newNickname = {};
+			newNickname["nickname-" + j] = ko.observable(data.naming[i].nicknames[j]);
+			this.names()[i].nicknames.push(newNickname);
+		}
 	}
 
 // Computed observables
@@ -37,6 +62,28 @@ var Cat = function(data) {
 		}
 	}, this);
 	
+	/* this.nameString:
+		- Returns a proper textual representation of the cat's names
+		- The last two cats are concatenated with and "and"
+		- The cats before are concatenated with a comma */
+	this.nameString = ko.computed(function() {
+		var amount = this.names().length;
+		if (amount === 1) {
+			return this.names()[0]["name"]();
+		}
+		else if (amount === 2) {
+			return this.names()[0]["name"]() + " and " + this.names()[1]["name"]();
+		}
+		else {
+			var returnString = "";
+			for (var i = 0; i < amount - 2; i++) {
+				returnString += this.names()[i]["name"]() + ", ";
+			}
+			returnString += this.names()[amount - 2]["name"]() + " and " + this.names()[amount - 1]["name"]();
+			return returnString;
+		}
+		
+	}, this);
 };
 
 

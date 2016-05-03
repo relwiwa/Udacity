@@ -1,21 +1,34 @@
 var initialCats = [{
-	name: "Tommy",
+	naming: [{
+		name: "Tommy",
+		nicknames: ["Tomti", "Tommmmahawk"]
+	}],
 	imgSrc: "images/cat-649164_640.jpg",
-	nicknames: ["Tomti", "Tommmmahawk"]
 }, {
-	name: "Bobby",
-	imgSrc: "images/cat-401124_640.jpg",
-	nicknames: ["Bobster"]
+	naming: [{
+		name: "Susan",
+		nicknames: ["Suzzz"]
+	}, {
+		name: "Christy",
+		nicknames: ["Chrizzzzy", "Big C"]
+	}],
+	imgSrc: "images/cat-205757_640.jpg"
 }, {
-	name: "Susan and Christy",
-	imgSrc: "images/cat-205757_640.jpg",
-	nicknames: [""]
+	naming: [{
+		name: "Bobby",
+		nicknames: ["Bobster"]
+	}],
+	imgSrc: "images/cat-401124_640.jpg"
 }, {
-	name: "Cindy",
-	imgSrc: "images/cat-1280855_640.jpg",
-	nicknames: ["Cinderella"]
+	naming: [{
+		name: "Cindy",
+		nicknames: ["Cinderella"]
+	}],
+	imgSrc: "images/cat-1280855_640.jpg"
 }, {
-	name: "Berta",
-	imgSrc: "images/cats-796437_640.jpg",
-	nicknames: ["Berta the Alligator", "Bertalomeus"]
+	naming: [{
+		name: "Berta",
+		nicknames: ["Berta the Alligator", "Bertalomeus"]
+	}],
+	imgSrc: "images/cats-796437_640.jpg"
 }];

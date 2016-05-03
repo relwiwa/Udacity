@@ -15,31 +15,44 @@
 			<div id="full-view" data-bind="with: currentCat">
 				<img src="" data-bind="click: $parent.incrementCounter, attr: {src: imgSrc}">
 				<div id="cat-legend">
-					<p>The image of <span class="highlight" data-bind="text: name"></span> has been clicked <span class="highlight" data-bind="text: clickCount"></span> times, so it's a<span data-bind="if: level().charAt(0).match(/[aeiou]/)">n</span> <span class="highlight" data-bind="text: level"></span>.</p>
-					<p><span data-bind="text: name"></span> has the following nickname<span data-bind="if: nicknames().length > 1">s</span>:</p>
-					<ul data-bind="foreach: nicknames">
-						<li data-bind="text: $data['nickname-' + $index()]"></li>
-					</ul>
+					<p>The image of <span class="highlight" data-bind="text: nameString"></span> has been clicked <span class="highlight" data-bind="text: clickCount"></span> times, so it's a<span data-bind="if: level().charAt(0).match(/[aeiou]/)">n</span> <span class="highlight" data-bind="text: level"></span>.</p>
+					
+					<!-- nested foreach loops:
+								- for each cat on a picture, the outer loop runs once
+								- for each nickname of a cat, the inner loop runs the number of
+									nicknames times -->
+					<div data-bind="foreach: names">
+						<p><span data-bind="text: $data.name"></span> has the following nickname<span data-bind="if: $data.nicknames().length > 1">s</span>:</p>
+						<ul data-bind="foreach: $data.nicknames">
+							<li data-bind="text: $data['nickname-' + $index()]"></li>
+						</ul>
+					</div>
 				</div>
 			</div>
-			
+	
 			<div id="admin-view" data-bind="visible: adminViewDisplayed, with: currentCat">
 				
 				<h3>Admin Area</h3>
 				
-				<label for="admin-name">Name:</label>
-				<input name="admin-name" type="text" data-bind="value: name" /><br>
-				<!-- ko foreach: nicknames -->
+				<!-- nested foreach loop:
+							- similar to loop above -->
+				<!-- ko foreach: names -->
+				<label for="" data-bind="attr: {for: 'admin-name-' + $index()}">Name:</label>
+				<input name="" type="text" data-bind="value: $data.name, attr: {name: 'admin-name-' + $index()}" /><br>
+
+				<!-- ko foreach: $data.nicknames -->
 				<label for="" data-bind="text: 'Nickname ' + ($index() + 1) + ':', attr: {for: 'admin-nicknames-' + $index()}"></label>
 				<input name="" type="text" data-bind="value: $data['nickname-' + $index()], attr: {name: 'admin-nicknames-' + $index()}" /><br>
+				<!-- /ko -->
+
 				<!-- /ko -->
 				<label name="admin-url">Url:</label>
 				<input name="admin-url" type="text" data-bind="value: imgSrc" /><br>
 				<label for="admin-counter">Clicked:</label>
 				<input name="admin-counter" type="number" data-bind="value: clickCount" />
-		
-				
+			
 			</div>
+
 
 	</div>
 	
