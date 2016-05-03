@@ -56,6 +56,19 @@ var ViewModel = function() {
 		self.currentCat(data);
 	};
 	
+	this.adminViewDisplayed = ko.observable(false);
+	
+	this.toggleAdminView = function() {
+		if (self.adminViewDisplayed() == true) {
+			document.getElementById("admin").style.opacity = "0.5";
+			self.adminViewDisplayed(false);
+		}
+		else {
+			document.getElementById("admin").style.opacity = "1.0";
+			self.adminViewDisplayed(true);
+		}
+	}
+
 };
 
 ko.applyBindings(new ViewModel());

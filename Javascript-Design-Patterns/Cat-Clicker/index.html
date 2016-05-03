@@ -22,16 +22,29 @@
 					</ul>
 				</div>
 			</div>
-
+			
+			<div id="admin-view" data-bind="visible: adminViewDisplayed, with: currentCat">
+				
+				<h3>Admin Area</h3>
+				
+				<label for="admin-name">Name:</label>
+				<input name="admin-name" type="text" data-bind="value: name" /><br>
+				<label name="admin-url">Url:</label>
+				<input name="admin-url" type="text" data-bind="value: imgSrc" /><br>
+				<label for="admin-counter">Clicked:</label>
+				<input name="admin-counter" type="number" data-bind="value: clickCount" />
+			
+			</div>
 
 	</div>
 	
 	<div id="list-view" data-bind="foreach: allCats">
 		<img src="" data-bind="click: $parent.changeCurrentCat, attr: {src: $data.imgSrc}">
 	</div>
-		
+
 	<div id="pixabay">All images from <a href="http://www.pixabay.com">pixabay.com</a>.</div>
 	
+	<div id="admin"><a href="#" title="Admin Area" data-bind="click: toggleAdminView">Admin</a></div>
 
 	<script type='text/javascript' src='js/knockout-3.4.0.min.js'></script>
 	<script src="js/cat-data.js" ></script>
