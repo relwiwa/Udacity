@@ -19,12 +19,17 @@ body {
 }
 
 #full-view {
-	display:none;
+	display:block;
+	padding:5%;
 }
 
 #full-view img {
-	max-width:90%;
-	margin:5%;
+	max-width:70%;
+	margin:0 5%;
+}
+
+#full-view li {
+	text-align:left;
 }
 
 #admin-view {
@@ -82,7 +87,7 @@ img {
 	border-radius:10%;
 }
 
-span {
+.highlight {
 	font-weight:bold;
 }
 

@@ -4,7 +4,6 @@
 <head>
 	<title>Cat Clicker | Udacity Javascript Design Patterns</title>
 	<meta charset="utf-8" />
-	<script src="js/main.js" ></script>
 	<link rel="stylesheet" href="styles/main.css">
 </head>
 
@@ -14,37 +13,23 @@
 		<div id="left">
 
 			<div id="full-view">
-				<p id="cat-legend">The image of <span id="cat-name"></span> has been clicked <span id="cat-counter"></span> times</p>
-			</div>
-
-			<div id="admin-view">
-				
-				<h3>Admin Area</h3>
-				
-				<label for="admin-name">Name:</label>
-				<input id="admin-name" name="admin-name" type="text" /><br>
-				<label name="admin-url">Url:</label>
-				<input id="admin-url" name="admin-url" type="text" /><br>
-				<label for="admin-counter">Clicked:</label>
-				<input id="admin-counter" name="admin-counter" type="number" />
-				
-				<div id="admin-buttons">
-					<input id="admin-cancel" type="button" value="Cancel" />
-					<input id="admin-save" type="button" value="Save" />
+				<img src="" data-bind="click: incrementCounter, attr: {src: imgSrc}">
+				<div id="cat-legend">
+					<p>The image of <span class="highlight" data-bind="text: name"></span> has been clicked <span class="highlight" data-bind="text: clickCount"></span> times, so it's a<span data-bind="if: level().charAt(0).match(/[aeiou]/)">n</span> <span class="highlight" data-bind="text: level"></span>.</p>
+					<p><span data-bind="text: name"></span> has the following nickname<span data-bind="if: nicknames().length > 1">s</span>:</p>
+					<ul data-bind="foreach: nicknames">
+						<li data-bind="text: $data"></li>
+					</ul>
 				</div>
-			
 			</div>
 
-		</div>
-		
-		<div id="list-view"></div>
 
 	</div>
 	
 	<div id="pixabay">All images from <a href="http://www.pixabay.com">pixabay.com</a>.</div>
 	
-	<div id="admin"><a id="admin-button" href="#" title="Admin Area">Admin</a></div>
-	
+
+	<script type='text/javascript' src='js/knockout-3.4.0.min.js'></script>
+	<script src="js/main.js" ></script>
 </body>
-	
 </html>
