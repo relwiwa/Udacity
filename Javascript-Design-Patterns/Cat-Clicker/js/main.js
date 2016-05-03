@@ -2,11 +2,17 @@
 
 	 Another Go at the Cat Clicker App, this time using Knockout.js */
 
-var ViewModel = function() {
+var Cat = function() {
+
+// Observables
+	
 	this.clickCount = ko.observable(0);
 	this.name = ko.observable("Tommy");
 	this.imgSrc = ko.observable("images/cat-649164_640.jpg");
 	this.nicknames = ko.observableArray(["Tomti", "Tommmmahawk"]);
+
+// Computed observables
+
 	this.level = ko.computed(function() {
 		var clicks = this.clickCount();
 		if (clicks < 10) {
@@ -25,9 +31,17 @@ var ViewModel = function() {
 			return "senior";
 		}
 	}, this);
+	
+};
 
+
+var ViewModel = function() {
+	var self = this;
+
+	this.currentCat = ko.observable(new Cat());
+	
 	this.incrementCounter = function() {
-		this.clickCount(this.clickCount() + 1);
+		self.currentCat().clickCount(self.currentCat().clickCount() + 1);
 	};
 	
 };
