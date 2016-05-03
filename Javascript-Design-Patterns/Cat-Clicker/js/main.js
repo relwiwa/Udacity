@@ -9,7 +9,12 @@ var Cat = function(data) {
 	this.clickCount = ko.observable(0);
 	this.name = ko.observable(data.name);
 	this.imgSrc = ko.observable(data.imgSrc);
-	this.nicknames = ko.observableArray(data.nicknames);
+	this.nicknames = ko.observableArray();
+	for (var i = 0; i < data.nicknames.length; i++) {
+		var newNickname = {};
+		newNickname["nickname-" + i] = ko.observable(data.nicknames[i]);
+		this.nicknames.push(newNickname);
+	}
 
 // Computed observables
 
@@ -67,7 +72,7 @@ var ViewModel = function() {
 			document.getElementById("admin").style.opacity = "1.0";
 			self.adminViewDisplayed(true);
 		}
-	}
+	};
 
 };
 
