@@ -15,7 +15,7 @@
 			<div id="full-view" data-bind="with: currentCat">
 				<img src="" data-bind="click: $parent.incrementCounter, attr: {src: imgSrc}">
 				<div id="cat-legend">
-					<p>The image of <span class="highlight" data-bind="text: nameString"></span> has been clicked <span class="highlight" data-bind="text: clickCount"></span> times, so it's a<span data-bind="if: level().charAt(0).match(/[aeiou]/)">n</span> <span class="highlight" data-bind="text: level"></span>.</p>
+					<p>The image of <span class="highlight" data-bind="text: nameString"></span> has been clicked <span class="highlight" data-bind="text: clickCount"></span> times, so <span data-bind="text: levelString().before"></span><span class="highlight" data-bind="text: level"></span><span class="highlight" data-bind="text: levelString().after"></span>.</p>
 					
 					<!-- nested foreach loops:
 								- for each cat on a picture, the outer loop runs once

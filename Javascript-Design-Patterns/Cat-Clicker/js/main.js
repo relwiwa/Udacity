@@ -61,7 +61,26 @@ var Cat = function(data) {
 			return "senior";
 		}
 	}, this);
-	
+
+	/* this.levelString:
+		- Returns the correct singular or plural parts to be displayed in the view */	
+	this.levelString = ko.computed(function() {
+		var level = this.level();
+		var phrase = {};
+		if (this.multipleCats()) {
+			phrase.before = "they are ";
+			phrase.after = "s";
+		}
+		else {
+			phrase.before = "it is a";
+			if (level.charAt(0).match(/[aeiou]/)) {
+				phrase.before += "n";
+			}
+			phrase.before += " ";
+		}
+		return phrase;
+	}, this);
+
 	/* this.nameString:
 		- Returns a proper textual representation of the cat's names
 		- The last two cats are concatenated with and "and"
@@ -84,6 +103,7 @@ var Cat = function(data) {
 		}
 		
 	}, this);
+	
 };
 
 
