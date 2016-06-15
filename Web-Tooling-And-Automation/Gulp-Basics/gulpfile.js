@@ -4,6 +4,7 @@ var autoprefixer = require('gulp-autoprefixer');
 
 gulp.task('default', function() {
 	console.log("Hello World");
+	gulp.watch('sass/**/*.scss', ['styles']);
 });
 
 // styles task to tranform scss to css files
