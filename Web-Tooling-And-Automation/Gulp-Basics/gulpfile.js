@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var sass = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var eslint = require('gulp-eslint');
+var jasmine = require('gulp-jasmine-phantom');
 
 gulp.task('default', ['eslint'], function() {
 	console.log("Hello World");
@@ -39,4 +40,14 @@ gulp.task('styles', function() {
 		}))
 		// state output directory for css files
 		.pipe(gulp.dest('./css'))
+});
+
+// testing with gulp
+gulp.task('tests', function() {
+	gulp.src('tests/spec/extraSpec.js')
+		.pipe(jasmine({
+			// false: use minijasminenode; true: use phantomjs
+			integration: false,
+			vendor: 'js/**/*.js'		
+		}));
 });
