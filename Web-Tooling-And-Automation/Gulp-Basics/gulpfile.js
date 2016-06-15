@@ -3,12 +3,17 @@ var sass = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var eslint = require('gulp-eslint');
 var jasmine = require('gulp-jasmine-phantom');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
+var imagemin = require('gulp-imagemin');
 
-gulp.task('default', ['eslint'], function() {
+gulp.task('default', ['eslint', 'styles', 'scripts', 'create-dist'], function() {
 	console.log("Hello World");
 	gulp.watch('sass/**/*.scss', ['styles']);
 	gulp.watch('js/**/*js', ['eslint']);
 });
+
+// TASKS FOR PRODUCTION ENVIRONMENT
 
 // code snippet taken from: https://www.npmjs.com/package/gulp-eslint
 gulp.task('eslint', function () {
@@ -39,7 +44,15 @@ gulp.task('styles', function() {
 			browsers: ['last 2 versions', '> 1%', 'ie > 8']
 		}))
 		// state output directory for css files
-		.pipe(gulp.dest('./css'))
+		.pipe(gulp.dest('css'))
+});
+
+// scripts task to create one all.js file from the files listed
+gulp.task('scripts', function() {
+	// files listed for correct order of concatenating files
+	gulp.src(['js/main.js', 'js/extra.js'])
+		.pipe(concat('all.js'))
+		.pipe(gulp.dest('js'));
 });
 
 // testing with gulp
@@ -50,4 +63,47 @@ gulp.task('tests', function() {
 			integration: false,
 			vendor: 'js/**/*.js'		
 		}));
+});
+
+// TASKS FOR DISTRIBUTION ENVIRONMENT
+
+// create-dist calls all relevant tasks to create complete distribution
+gulp.task('create-dist', [
+	'to-dist-html',
+	'to-dist-images',
+	'to-dist-styles',
+	'to-dist-scripts'
+]);
+
+// put html files to distribution
+gulp.task('to-dist-html', function() {
+	gulp.src('./*.html')
+		.pipe(gulp.dest('dist'));
+});
+
+// run images through imagemin before putting them to distribution, 
+gulp.task('to-dist-images', function() {
+	gulp.src('img/*')
+		.pipe(imagemin())
+		.pipe(gulp.dest('dist/img'));
+});
+
+// create css files in compressed format and put them to distribution
+gulp.task('to-dist-styles', function() {
+	gulp.src('sass/**/*.scss')
+		.pipe(sass({
+			outputStyle: 'compressed'
+		}).on('error', sass.logError))
+		.pipe(autoprefixer({
+			browsers: ['last 2 versions', '> 1%', 'ie > 8']
+		}))
+		.pipe(gulp.dest('dist/css'));
+});
+
+// concatenate the js files listed to all.js, uglify it and put it to distribution 
+gulp.task('to-dist-scripts', function() {
+	gulp.src(['js/main.js', 'js/extra.js'])
+		.pipe(concat('all.js'))
+		.pipe(uglify())
+		.pipe(gulp.dest('dist/js'));
 });
