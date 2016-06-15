@@ -6,11 +6,17 @@ var jasmine = require('gulp-jasmine-phantom');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var imagemin = require('gulp-imagemin');
+var browserSync = require('browser-sync').create();
 
 gulp.task('default', ['eslint', 'styles', 'scripts', 'create-dist'], function() {
 	console.log("Hello World");
 	gulp.watch('sass/**/*.scss', ['styles']);
-	gulp.watch('js/**/*js', ['eslint']);
+	gulp.watch('js/**/*js', ['eslint', 'scripts']);
+	gulp.watch('./index.html').on('change', browserSync.reload);
+	browserSync.init({
+		server: './'
+	});
+	browserSync.stream();	
 });
 
 // TASKS FOR PRODUCTION ENVIRONMENT
@@ -45,6 +51,7 @@ gulp.task('styles', function() {
 		}))
 		// state output directory for css files
 		.pipe(gulp.dest('css'))
+		.pipe(browserSync.stream());
 });
 
 // scripts task to create one all.js file from the files listed
@@ -52,7 +59,8 @@ gulp.task('scripts', function() {
 	// files listed for correct order of concatenating files
 	gulp.src(['js/main.js', 'js/extra.js'])
 		.pipe(concat('all.js'))
-		.pipe(gulp.dest('js'));
+		.pipe(gulp.dest('js'))
+		.pipe(browserSync.stream());
 });
 
 // testing with gulp
