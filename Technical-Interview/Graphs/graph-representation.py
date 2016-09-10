@@ -13,10 +13,14 @@ class Graph(object):
     def __init__(self, nodes=[], edges=[]):
         self.nodes = nodes
         self.edges = edges
+        self.max_node_val = None
 
     def insert_node(self, new_node_val):
         new_node = Node(new_node_val)
         self.nodes.append(new_node)
+        if self.max_node_val == None or new_node_val > self.max_node_val:
+            self.max_node_val = new_node_val
+        return new_node
         
     def insert_edge(self, new_edge_val, node_from_val, node_to_val):
         from_found = None
@@ -27,11 +31,9 @@ class Graph(object):
             if node_to_val == node.value:
                 to_found = node
         if from_found == None:
-            from_found = Node(node_from_val)
-            self.nodes.append(from_found)
+            from_found = self.insert_node(node_from_val)
         if to_found == None:
-            to_found = Node(node_to_val)
-            self.nodes.append(to_found)
+            to_found = self.insert_node(node_to_val)
         new_edge = Edge(new_edge_val, from_found, to_found)
         from_found.edges.append(new_edge)
         to_found.edges.append(new_edge)
@@ -41,7 +43,10 @@ class Graph(object):
         """Don't return a list of edge objects!
         Return a list of triples that looks like this:
         (Edge Value, From Node Value, To Node Value)"""
-        return []
+        edge_list = []
+        for edge in self.edges:
+            edge_list.append((edge.value, edge.node_from.value, edge.node_to.value))
+        return edge_list
 
     def get_adjacency_list(self):
         """Don't return any Node or Edge objects!
@@ -51,7 +56,13 @@ class Graph(object):
         Each section in the list will store a list
         of tuples that looks like this:
         (To Node, Edge Value)"""
-        return []
+        adj_li = [None] * (self.max_node_val + 1)
+        for edge in self.edges:
+            if adj_li[edge.node_from.value] == None:
+                adj_li[edge.node_from.value] = [(edge.node_to.value, edge.value)]
+            else:
+                adj_li[edge.node_from.value].append((edge.node_to.value, edge.value))
+        return adj_li
     
     def get_adjacency_matrix(self):
         """Return a matrix, or 2D list.
@@ -59,7 +70,12 @@ class Graph(object):
         column numbers represent to nodes.
         Store the edge values in each spot,
         and a 0 if no edge exists."""
-        return []
+        adj_ma = []
+        for n in range(0, self.max_node_val + 1):
+            adj_ma.append([0] * (self.max_node_val + 1))
+        for edge in self.edges:
+            adj_ma[edge.node_from.value][edge.node_to.value] = edge.value
+        return adj_ma
 
 graph = Graph()
 graph.insert_edge(100, 1, 2)
