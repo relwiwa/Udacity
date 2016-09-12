@@ -96,7 +96,7 @@ class Graph(object):
         def map_conversion(adjacency_list_for_node):
             if adjacency_list_for_node is None:
                 return None
-            return list(map(convert_to_names, adjacency_list_for_node))
+            return map(convert_to_names, adjacency_list_for_node)
         return [map_conversion(adjacency_list_for_node)
                 for adjacency_list_for_node in adjacency_list]
 
@@ -144,21 +144,22 @@ class Graph(object):
         """
         ret_list = [start_node.value]
         # Your code here
+        adj_l = self.get_adjacency_list()
         stack = [start_node]
         start_node.visited = True
         while (stack):
             unvis_node = None
-            for edge in stack[-1].edges:
-                if edge.node_to.visited == False:
-                    unvis_node = edge.node_to
+            for node_num in adj_l[stack[-1].value]:
+                curr_node = self.find_node(node_num[0])
+                if curr_node.visited == False:
+                    unvis_node = curr_node
                     break
             if not unvis_node == None:
                 unvis_node.visited = True
-                stack.append(unvis_node)
                 ret_list.append(unvis_node.value)
+                stack.append(unvis_node)
             else:
                 stack.pop()
-        print(ret_list)
         return ret_list
 
     def dfs(self, start_node_num):
@@ -173,7 +174,7 @@ class Graph(object):
 
     def dfs_names(self, start_node_num):
         """Return the results of dfs with numbers converted to names."""
-        return [self.node_names[num] for num in self.dfs(start_node_num)]
+        return list([self.node_names[num] for num in self.dfs(start_node_num)])
 
     def bfs(self, start_node_num):
         """TODO: Create an iterative implementation of Breadth First Search
@@ -184,19 +185,19 @@ class Graph(object):
         RETURN: a list of the node values (integers)."""
         node = self.find_node(start_node_num)
         self._clear_visited()
-        ret_list = []
-        queue = deque([node])
         # Your code here
+        node.visited = True
+        ret_list = [node.value]
+        queue = deque([node])
+        adj_l = self.get_adjacency_list()
         while (queue):
-            node = queue.popleft();
-            if node.visited == False:
-                ret_list.append(node.value)
-                node.visited = True
-            for edge in node.edges:
-                if edge.node_to.visited == False:
-                    queue.append(edge.node_to)
-                    ret_list.append(edge.node_to.value)
-                    edge.node_to.visited = True
+            node = queue.popleft()
+            for node_num in adj_l[node.value]:
+                curr_node = self.find_node(node_num[0])
+                if curr_node.visited == False:
+                    curr_node.visited = True
+                    ret_list.append(curr_node.value)
+                    queue.append(curr_node)
         return ret_list
 
     def bfs_names(self, start_node_num):
