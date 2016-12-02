@@ -1,5 +1,9 @@
 var data = [4, 8, 15, 16, 23, 42];
 
+var x = d3.scale.linear()
+  .domain([0, d3.max(data)])
+  .range([0, 420]);
+
 // UNCHAINED VERSION
 
 var chart = d3.select('.chart');
@@ -17,7 +21,7 @@ var barEnter = barUpdate.enter().append('div');
 
 // d in function refers to data that was linked via data-function
 barEnter.style('width', function(d) {
-  return d * 10 + "px";
+  return x(d) + "px";
 });
 
 barEnter.text(function(d) {
@@ -33,7 +37,7 @@ d3.select(".chart")
     .data(data)
   .enter().append("div")
     .style("width", function(d) {
-      return d * 10 + "px";
+      return x(d) + "px";
     })
     .text(function(d) {
       return d;
