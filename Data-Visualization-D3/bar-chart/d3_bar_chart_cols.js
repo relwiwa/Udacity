@@ -8,9 +8,10 @@ var chart = d3.select(".chart")
   .attr("width", width)
   .attr("height", height);
 
-d3.tsv("data.tsv", toInteger, function(error, data) {
+d3.tsv("letters.tsv", toInteger, function(error, data) {
+  console.log(data);
   y.domain([0, d3.max(data, function(d) {
-    return d.value;
+    return d.frequency;
   })]);
   
   var barWidth = width/data.length;
@@ -24,25 +25,16 @@ d3.tsv("data.tsv", toInteger, function(error, data) {
   
   bar.append("rect")
     .attr("y", function(d) {
-      return y(d.value);
+      return y(d.frequency);
     })
     .attr("height", function(d) {
-      return height - y(d.value);
+      return height - y(d.frequency);
     })
     .attr("width", barWidth - 1);
   
-  bar.append("text")
-    .attr("x", barWidth/2)
-    .attr("y", function(d) {
-      return y(d.value) + 3;
-    })
-  .attr("dy", ".75em")
-  .text(function(d) {
-    return d.value;
-  });  
 });
 
 function toInteger(d) {
-  d.value = +d.value;
+  d.frequency = +d.frequency;
   return d;
 }
