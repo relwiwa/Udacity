@@ -19,7 +19,8 @@ var y = d3.scale.linear()
 
 var yAxis = d3.svg.axis()
   .scale(y)
-  .orient("left");
+  .orient("left")
+  .ticks(10, "%");
 
 /*  "To apply the margins to the SVG container, we set the width
     and height of the SVG element to the outer dimensions, and add
@@ -46,7 +47,13 @@ d3.tsv("letters.tsv", toInteger, function(error, data) {
   
   chart.append("g")
     .attr("class", "y axis")
-    .call(yAxis);
+    .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
 
   chart.selectAll(".bar")
     .data(data)

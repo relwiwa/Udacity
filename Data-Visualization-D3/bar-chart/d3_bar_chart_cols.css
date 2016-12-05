@@ -10,6 +10,7 @@
 
 .axis text {
   font: 10px sans-serif;
+  fill:#000;
 }
 
 .axis path,
