@@ -9,6 +9,10 @@ circle {
   stroke-width: 0.7;
   opacity: 0.7;
 }
+  
+h2 {
+  text-align: center;
+}
 </style>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript">
@@ -20,6 +24,11 @@ function draw(geo_data) {
   var margin = 75,
       width = 1920 - margin,
       height = 1080 - margin;
+
+    d3.select('body')
+    .append('h2')
+    .text('World Cup attendance and participating countries');
+
   
   var svg = d3.select("body")
     .append("svg")
@@ -45,8 +54,8 @@ function draw(geo_data) {
     .enter()
     .append('path')
     .attr('d', path)
-    .style('fill', 'rgb(9, 157, 217)')
-    .style('stroke', 'black')
+    .style('fill', 'lightgray')
+    .style('stroke', 'lightgray')
     .style('stroke-width', 0.5);
 
   /* SETUP CIRCLES IN MAP */
@@ -112,8 +121,9 @@ function draw(geo_data) {
     function extract_key(d) {
       return d['key'];
     }
-    
-    svg.append('g')
+
+    // hide circles before animation starts
+/*    svg.append('g')
       .attr('class', 'bubble')
       .selectAll('circle')
       // sort data so that smaller circles are drawn on top of bigger circles
@@ -131,7 +141,7 @@ function draw(geo_data) {
       })
       .attr('r', function(d) {
         return radius(d.values.attendance);
-      });
+      });*/
 
     /* SETUP UPDATE FUNCTIONALITY TO ONLY SHOW ONE YEAR */
     
@@ -144,6 +154,9 @@ function draw(geo_data) {
         return (new Date(d.key).getUTCFullYear() === year);
       });
       
+      d3.select('h2')
+        .text('World Cup attendance and participating countries: ' + year);
+      
       // filter circle of respective year to display
       var circles = svg.selectAll('circle')
         .data(filtered, extract_key)
@@ -154,6 +167,8 @@ function draw(geo_data) {
       // let circle of respective year be displayed (if it is not yet displayed)
       circles.enter()
         .append('circle')
+        .transition()
+        .duration(500)
         .attr('cx', function(d) {
           return d.values.x;
         })
@@ -178,12 +193,33 @@ function draw(geo_data) {
       }
 
       svg.selectAll('path')
+        .transition()
+        .duration(500)
         .style('fill', update_countries)
         .style('stroke', update_countries);
     }
     
-    update(2006);
-
+    // CREATE INTERVAL-BASED AUTHOR-DRIVEN ANIMATION
+    
+    var years = [];
+    
+    for (var i = 1930; i < 2015; i += 4) {
+      if (i !== 1942 && i !== 1946) {
+        years.push(i);
+      }
+    }
+    
+    var year_index = 0;
+    
+    var year_interval = setInterval(function() {
+      update(years[year_index]);
+      year_index++;
+      
+      if (year_index >= years.length) {
+        clearInterval(year_interval);
+      }
+    }, 1000);
+    
   }
   
   var format = d3.time.format('%d-%m-%Y (%H:%M h)');
