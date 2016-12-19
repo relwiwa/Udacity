@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <style>
-
+circle {
+  fill: orange;
+  stroke: black;
+  stroke-width: 0.7;
+  opacity: 0.7;
+}
 </style>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript">
@@ -72,11 +77,20 @@ function draw(geo_data) {
           return d[1];
         });
         
+        // create set containing all teams participating in a year
+        var teams = d3.set();
+        
+        leaves.forEach(function(d) {
+          teams.add(d['team1']);
+          teams.add(d['team2']);
+        });
+        
         // create object that's returned
         return {
           'attendance': total,
           'x': center_x,
-          'y': center_y
+          'y': center_y,
+          'teams': teams.values()
         };
       })
       // pass all data elements to keys and rollup functions
@@ -94,13 +108,19 @@ function draw(geo_data) {
       .domain([0, attendance_max])
       .range([0, 12]);
     
+    // custom key function used for dynamic data-binding
+    function extract_key(d) {
+      return d['key'];
+    }
+    
     svg.append('g')
       .attr('class', 'bubble')
       .selectAll('circle')
       // sort data so that smaller circles are drawn on top of bigger circles
       .data(nested.sort(function(a, b) {
         return b.values.attendance - a.values.attendance;
-      }))
+      // add custom key function
+      }), extract_key)
       .enter()
       .append('circle')
       .attr('cx', function(d) {
@@ -111,11 +131,59 @@ function draw(geo_data) {
       })
       .attr('r', function(d) {
         return radius(d.values.attendance);
-      })
-      .attr('fill', 'rgb(247,148,32)')
-      .attr('stroke', 'black')
-      .attr('stroke-width', 0.7)
-      .attr('opacity', 0.7);
+      });
+
+    /* SETUP UPDATE FUNCTIONALITY TO ONLY SHOW ONE YEAR */
+    
+    function update(year) {
+      
+      // FILTER CIRCLE OF RESPECTIVE YEAR TO DISPLAY
+      
+      // filter respective year to display
+      var filtered = nested.filter(function(d) {
+        return (new Date(d.key).getUTCFullYear() === year);
+      });
+      
+      // filter circle of respective year to display
+      var circles = svg.selectAll('circle')
+        .data(filtered, extract_key)
+      
+      // remove circles of all other years
+      circles.exit().remove();
+      
+      // let circle of respective year be displayed (if it is not yet displayed)
+      circles.enter()
+        .append('circle')
+        .attr('cx', function(d) {
+          return d.values.x;
+        })
+        .attr('cy', function(d) {
+          return d.values.y;
+        })
+        .attr('r', function(d) {
+          return radius(d.values.attendance);
+        });
+      
+      // HIGHLIGHT ALL PARTICIPATING COUNTRIES OF A YEAR
+      
+      var countries = filtered[0].values.teams;
+      
+      function update_countries(d) {
+        if (countries.indexOf(d.properties.name) !== -1) {
+          return 'lightBlue';
+        }
+        else {
+          return 'lightGray';
+        }
+      }
+
+      svg.selectAll('path')
+        .style('fill', update_countries)
+        .style('stroke', update_countries);
+    }
+    
+    update(2006);
+
   }
   
   var format = d3.time.format('%d-%m-%Y (%H:%M h)');
