@@ -13,6 +13,17 @@ circle {
 h2 {
   text-align: center;
 }
+  
+div.years_buttons {
+    position: fixed;
+    top: 5px;
+    left: 50px;
+}
+div.years_buttons div {
+    background-color: rgb(251, 201, 127);
+    padding: 3px;
+    margin: 7px;
+}  
 </style>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript">
@@ -25,11 +36,18 @@ function draw(geo_data) {
       width = 1920 - margin,
       height = 1080 - margin;
 
-    d3.select('body')
+  var years = [];
+    
+  for (var i = 1930; i < 2015; i += 4) {
+    if (i !== 1942 && i !== 1946) {
+      years.push(i);
+    }
+  }
+  
+  d3.select('body')
     .append('h2')
     .text('World Cup attendance and participating countries');
 
-  
   var svg = d3.select("body")
     .append("svg")
     .attr("width", width + margin)
@@ -37,6 +55,8 @@ function draw(geo_data) {
     .append('g')
     .attr('class','map');
 
+
+  
   /* SETUP D3 MAP */
 
   /*  works similiar to scale function:
@@ -199,15 +219,8 @@ function draw(geo_data) {
         .style('stroke', update_countries);
     }
     
-    // CREATE INTERVAL-BASED AUTHOR-DRIVEN ANIMATION
-    
-    var years = [];
-    
-    for (var i = 1930; i < 2015; i += 4) {
-      if (i !== 1942 && i !== 1946) {
-        years.push(i);
-      }
-    }
+    /*  CREATE INTERVAL-BASED AUTHOR-DRIVEN ANIMATION
+        CONTAINING USER-BASED NARRATIVE */
     
     var year_index = 0;
     
@@ -217,6 +230,39 @@ function draw(geo_data) {
       
       if (year_index >= years.length) {
         clearInterval(year_interval);
+
+        // display buttons for user-driven narrative
+        var buttons = d3.select('body')
+          .append('div')
+          .attr('class', 'years_buttons')
+          .selectAll('div')
+          .data(years)
+          .enter()
+          .append('div')
+          .text(function(d) {
+            return d;
+          });
+        
+        // this is not a jQuery, but a native D3 event method
+        buttons.on('click', function(d) {
+          // reset all buttons
+          d3.select('.years_buttons')
+            .selectAll('div')
+            .transition()
+            .duration(500)
+            .style('background', 'rgb(251,201,127)')
+            .style('color', 'black');
+          
+          // highlight clicked button
+          d3.select(this)
+            .transition()
+            .duration(500)
+            .style('background', 'lightBlue')
+            .style('color', 'white');
+          
+          update(d);
+        });
+        
       }
     }, 1000);
     
