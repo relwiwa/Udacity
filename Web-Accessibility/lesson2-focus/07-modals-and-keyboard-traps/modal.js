@@ -43,16 +43,22 @@ function openModal() {
 
       // SHIFT + TAB
       if (e.shiftKey) {
-
+				if (document.activeElement === firstTabStop) {
+					e.preventDefault();
+					lastTabStop.focus();
+				}
       // TAB
       } else {
-
-      }
+				if (document.activeElement === lastTabStop) {
+					e.preventDefault();
+					firstTabStop.focus();
+    		}
+			}
     }
 
     // ESCAPE
     if (e.keyCode === 27) {
-
+			closeModal();
     }
   }
 }
